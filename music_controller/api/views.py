@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from rest_framework import generics
-from .serializers import RoomSerializer
+from .serializers import RoomSerializer, CreateRoomSerializer
+from rest_framework import generics, status # view and status codes
+from rest_framework.views import APIView
+from rest_framework.response import Response #custom responses
 from .models import Room
 
 # Create your views here.
@@ -8,3 +10,33 @@ from .models import Room
 class RoomView(generics.CreateAPIView): # creates a layout for you
   queryset = Room.objects.all()
   serializer_class = RoomSerializer
+
+class CreateRoomView(APIView):
+  serializer_class = CreateRoomSerializer
+
+  def post(self, request, format=None):
+    #checks users session info for user info instead of sending actual the user info from frontend to backend
+    if not self.request.session.exists(self.request.session.session_key):
+      self.request.session.create()
+
+    serializer = self.serializer_class(data=request.data)
+    if serializer.is_valid():
+      guest_can_pause = serializer.data.get('guest_can_pause') #serializer is json obj
+      votes_to_skip = serializer.data.get('votes_to_skip')
+      host = self.request.session.session_key
+
+      queryset = Room.objects.filter(host=host)
+      if queryset.exists():
+        room = queryset[0]
+        room.guest_can_pause = guest_can_pause
+        room.votes_to_skip = votes_to_skip
+        room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
+
+        return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
+      else:
+        room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
+        room.save()
+
+        return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED) #gives json format of room with serializer function
+
+    return Response({'Bad Request': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
