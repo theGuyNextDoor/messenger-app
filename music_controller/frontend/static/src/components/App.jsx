@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './HomePage.jsx';
 import JoinRoomPage from './JoinRoomPage.jsx';
 import CreateRoomPage from './CreateRoomPage.jsx';
-import Room from './Room.jsx';
+import Toggle from './Toggle.jsx';
 
 function App() {
   const [roomCode, setRoomCode] = useState(null);
@@ -23,7 +23,7 @@ function App() {
       <Route exact path="/" element={ roomCode ? (<Navigate to={`/room/${roomCode}`} />) : <HomePage />} />
         <Route path='/join' element={<JoinRoomPage />} />
         <Route path='/create' element={<CreateRoomPage />} />
-        <Route path='/room/:roomCode' element={<Room setRoomCallback={setRoomCode} />} />
+        <Route path='/room/:roomCode' element={<Toggle setRoomCallback={setRoomCode} />} />
       </Routes>
     </Router>
   );

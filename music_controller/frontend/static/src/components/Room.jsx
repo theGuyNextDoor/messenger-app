@@ -2,28 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { useParams, useNavigate } from 'react-router-dom'
 
-function Room({ setRoomCallback }) {
-  const [votesToSkip, setVotesToSkip] = useState(2);
-  const [guestCanPause, setGuestCanPause] = useState(false);
-  const [isHost, setIsHost] = useState(false);
-  const { roomCode } = useParams()
+function Room({ setRoomCallback, updateShowSettings, votesToSkip, guestCanPause, isHost, showSettings, roomCode }) {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    fetch(`/api/get-room?code=${roomCode}`)
-      .then((response) => {
-        // if (!response.ok) {
-        //   setRoomCallback(null);
-        //   const path = '/';
-        //   navigate(path);
-        return response.json();
-      })
-      .then((data) => {
-        setVotesToSkip(data.votes_to_skip)
-        setGuestCanPause(data.guest_can_pause)
-        setIsHost(data.is_host)
-      })
-  }, [])
 
   const leaveButtonPress = () => {
     const options = {
@@ -65,6 +45,12 @@ function Room({ setRoomCallback }) {
           Is Host: {isHost.toString()}
         </Typography>
       </Grid>
+
+      {!showSettings && (<Grid item xs={12} align="center">
+         <Button color="primary" variant="contained" onClick={updateShowSettings}>
+          Settings
+        </Button>
+      </Grid>)}
 
       <Grid item xs={12} align="center">
         <Button color="secondary" variant="contained" onClick={leaveButtonPress}>
