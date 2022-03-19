@@ -1,18 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './HomePage.jsx';
 import JoinRoomPage from './JoinRoomPage.jsx';
 import CreateRoomPage from './CreateRoomPage.jsx';
 import Room from './Room.jsx';
 
 function App() {
+  const [roomCode, setRoomCode] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/user-in-room')
+        .then((response) => response.json())
+        .then(({ code }) => {
+          console.log('effect code', code) // DELETE ME ------------------------
+          setRoomCode(code);
+        });
+  }, []);
+
   return (
     <Router>
       <Routes>
-      <Route exact path="/" element={<HomePage />} />
+      <Route exact path="/" element={ roomCode ? (<Navigate to={`/room/${roomCode}`} />) : <HomePage />} />
         <Route path='/join' element={<JoinRoomPage />} />
         <Route path='/create' element={<CreateRoomPage />} />
-        <Route path='/room/:roomCode' element={<Room />} />
+        <Route path='/room/:roomCode' element={<Room setRoomCallback={setRoomCode} />} />
       </Routes>
     </Router>
   );

@@ -1,4 +1,3 @@
-import re
 from django import http
 from django.shortcuts import render
 from .serializers import RoomSerializer, CreateRoomSerializer
@@ -80,3 +79,33 @@ class JoinRoom(APIView):
         return Response({'message': 'Room Joined!'}, status=status.HTTP_200_OK)
       return Response({'Bad Request': 'Invalid room code'}, status=status.HTTP_400_BAD_REQUEST)
     return Response({'Bad Request': 'Could not find code key'}, status=status.HTTP_400_BAD_REQUEST)
+
+class UserInRoom(APIView):
+
+  def get(self, request, format=None):
+    if not self.request.session.exists(self.request.session.session_key):
+      self.request.session.create()
+
+     # see of there is a roomcode the user is already logged when they go to homepage
+    data = {
+      'code': self.request.session.get('room_code'),
+    }
+    print('data =', data) # DELETE ME --------------------------------------
+
+    return http.JsonResponse(data, status=status.HTTP_200_OK)
+
+class LeaveRoom(APIView):
+  def post(self, request, format=None):
+    print('running post') # DELETE ME --------------------------------------
+    if 'room_code' in self.request.session:
+      print('found room_code') # DELETE ME --------------------------------------
+      self.request.session.pop('room_code')
+      host_id = self.request.session.session_key
+      room_results = Room.objects.filter(host=host_id)
+
+      if len(room_results) > 0:
+        print('running delete') # DELETE ME --------------------------------------
+        room = room_results[0]
+        room.delete()
+
+    return Response({'Message': 'Success'}, status=status.HTTP_200_OK)

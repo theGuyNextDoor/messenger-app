@@ -40,7 +40,7 @@ function CreateRoomPage() {
       <Grid item xs={12} align="center">
         <FormControl component="fieldset">
           <FormHelperText>
-            <div align="center">Guest Control</div>
+            <span align="center">Guest Control</span>
           </FormHelperText>
           <RadioGroup row defaultValue="true" onChange={handleGuestCanPauseChange}>
             <FormControlLabel
@@ -72,7 +72,7 @@ function CreateRoomPage() {
             }}
           />
           <FormHelperText>
-            <div align="center">Votes Required To Skip</div>
+            <span align="center">Votes Required To Skip</span>
           </FormHelperText>
         </FormControl>
       </Grid>
