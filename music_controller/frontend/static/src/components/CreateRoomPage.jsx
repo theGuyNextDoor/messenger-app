@@ -1,23 +1,26 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Grid, FormHelperText, FormControl, FormControlLabel, Typography, TextField, Button, Radio, RadioGroup} from '@material-ui/core'
+import { Grid, FormHelperText, FormControl, FormControlLabel, Typography, TextField, Button, Radio, RadioGroup, Collapse } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 
-function CreateRoomPage() {
-  const [guestCanPause, setGuestCanPause ] = useState(true);
-  const [votesToSkip, setVotesToSkip] = useState(2);
+function CreateRoomPage(props) {
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errMsg, setErrMsg] = useState('');
   const navigate = useNavigate();
+  const title = props.update ? 'Update Room' : 'Create A Room';
+  const btnTitle = props.update ? 'Update Room Settings' : 'Create Room';
 
   const handleVotesChanged = (e) => {
-    setVotesToSkip(e.target.value);
+    props.setVotesToSkip(e.target.value);
   }
   const handleGuestCanPauseChange = (e) => {
-    setGuestCanPause(e.target.value === 'true' ? true : false);
+    props.setGuestCanPause(e.target.value === 'true' ? true : false);
   }
-  const handleRoomBtnPressed = () => {
+  const handleCreateBtnPressed = () => {
     const options = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json'},
-      body: JSON.stringify({ votes_to_skip: votesToSkip, guest_can_pause: guestCanPause})
+      body: JSON.stringify({ votes_to_skip: props.votesToSkip, guest_can_pause: props.guestCanPause})
     };
 
     fetch('/api/create-room', options)
@@ -27,13 +30,42 @@ function CreateRoomPage() {
         navigate(path)
       });
   }
+  const handleUpdateBtnPressed = () => {
+    const options = {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        votes_to_skip: props.votesToSkip,
+        guest_can_pause: props.guestCanPause,
+        code: props.roomCode
+      })
+    };
 
+    fetch('/api/update-room', options)
+      .then((response) => {
+        if (response.ok) {
+          setSuccessMsg('Room Updated');
+          return response.json()
+        } else {
+          setErrMsg('Error updating room')
+        }
+      })
+  }
 
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
+        <Collapse in={successMsg !== '' || errMsg !== ''}>
+          {successMsg !== '' ?
+          (<Alert severity="success" onClose={()=> setSuccessMsg('')}>{successMsg}</Alert>)
+          :
+          (<Alert severity="error" onClose={()=> setErrMsg('')}>{errMsg}</Alert>)}
+        </Collapse>
+      </Grid>
+
+      <Grid item xs={12} align="center">
         <Typography component='h4' variant='h4'>
-          Create A Room
+          {title}
         </Typography>
       </Grid>
 
@@ -42,7 +74,7 @@ function CreateRoomPage() {
           <FormHelperText>
             <span align="center">Guest Control</span>
           </FormHelperText>
-          <RadioGroup row defaultValue="true" onChange={handleGuestCanPauseChange}>
+          <RadioGroup row value={props.guestCanPause.toString()} onChange={handleGuestCanPauseChange}>
             <FormControlLabel
               value="true"
               control={<Radio color="primary" />}
@@ -65,7 +97,7 @@ function CreateRoomPage() {
             required={true}
             type="number"
             onChange={handleVotesChanged}
-            defaultValue={votesToSkip}
+            defaultValue={props.votesToSkip}
             inputProps={{
               min: 1,
               style: { textAlign: "center"}
@@ -78,16 +110,20 @@ function CreateRoomPage() {
       </Grid>
 
       <Grid item xs={12} align="center">
-        <Button color="primary" variant="contained" onClick={handleRoomBtnPressed}>
-          Create A Room
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={props.update ? handleUpdateBtnPressed : handleCreateBtnPressed}
+        >
+          {btnTitle}
         </Button>
       </Grid>
 
-      <Grid item xs={12} align="center">
+      {!props.update && (<Grid item xs={12} align="center">
         <Button color="secondary" variant="contained" to="/" component={Link}>
           Back
         </Button>
-      </Grid>
+      </Grid>)}
 
     </Grid>
   )

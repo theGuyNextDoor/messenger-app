@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { useParams, useNavigate } from 'react-router-dom'
 
-function Room({ setRoomCallback, updateShowSettings, votesToSkip, guestCanPause, isHost, showSettings, roomCode }) {
+function Room(props) {
   const navigate = useNavigate()
 
   const leaveButtonPress = () => {
@@ -14,7 +14,7 @@ function Room({ setRoomCallback, updateShowSettings, votesToSkip, guestCanPause,
       .then((response) => {
         const path = '/';
 
-        setRoomCallback(null);
+        props.setRoomCallback(null);
         navigate(path);
       })
   }
@@ -24,30 +24,30 @@ function Room({ setRoomCallback, updateShowSettings, votesToSkip, guestCanPause,
 
       <Grid item xs={12} align="center">
         <Typography variant="h4" component="h6">
-          Code: {roomCode}
+          Code: {props.roomCode}
         </Typography>
       </Grid>
 
       <Grid item xs={12} align="center">
         <Typography variant="h6" component="h6">
-          Votes To Dkip: {votesToSkip}
+          Votes To Skip: {props.votesToSkip}
         </Typography>
       </Grid>
 
       <Grid item xs={12} align="center">
         <Typography variant="h6" component="h6">
-          Guest Can Pause: {guestCanPause.toString()}
+          Guest Can Pause: {props.guestCanPause.toString()}
         </Typography>
       </Grid>
 
       <Grid item xs={12} align="center">
         <Typography variant="h6" component="h6">
-          Is Host: {isHost.toString()}
+          Is Host: {props.isHost.toString()}
         </Typography>
       </Grid>
 
-      {!showSettings && (<Grid item xs={12} align="center">
-         <Button color="primary" variant="contained" onClick={updateShowSettings}>
+      {!props.showSettings && (<Grid item xs={12} align="center">
+         <Button color="primary" variant="contained" onClick={props.updateShowSettings}>
           Settings
         </Button>
       </Grid>)}

@@ -6,6 +6,8 @@ import CreateRoomPage from './CreateRoomPage.jsx';
 import Toggle from './Toggle.jsx';
 
 function App() {
+  const [guestCanPause, setGuestCanPause ] = useState(true);
+  const [votesToSkip, setVotesToSkip] = useState(2);
   const [roomCode, setRoomCode] = useState(null);
 
   useEffect(() => {
@@ -22,7 +24,14 @@ function App() {
       <Routes>
       <Route exact path="/" element={ roomCode ? (<Navigate to={`/room/${roomCode}`} />) : <HomePage />} />
         <Route path='/join' element={<JoinRoomPage />} />
-        <Route path='/create' element={<CreateRoomPage />} />
+        <Route path='/create' element={<CreateRoomPage
+          update={false}
+          votesToSkip={votesToSkip}
+          setVotesToSkip={setVotesToSkip}
+          guestCanPause={guestCanPause}
+          setGuestCanPause={setGuestCanPause}
+          />}
+        />
         <Route path='/room/:roomCode' element={<Toggle setRoomCallback={setRoomCode} />} />
       </Routes>
     </Router>
