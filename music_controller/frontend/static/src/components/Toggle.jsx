@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Button, Typography } from '@material-ui/core'
+import { Grid, Button, Typography } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import Room from './Room.jsx'
 import Settings from './Settings.jsx'
@@ -12,7 +12,7 @@ function Toggle({ setRoomCallback }) {
   const [showSettings, setShowSettings] = useState(false);
   const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
   const { roomCode } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNavigate({});
 
   useEffect(() => {
     fetch(`/api/get-room?code=${roomCode}`)
@@ -21,19 +21,21 @@ function Toggle({ setRoomCallback }) {
           setRoomCallback(null);
           const path = '/';
           navigate(path);
-        } else {
-          return response.json();
         }
+        return response.json();
       })
       .then((data) => {
-        setVotesToSkip(data.votes_to_skip);
-        setGuestCanPause(data.guest_can_pause);
-        setIsHost(data.is_host);
-        if (data.is_host) {
-          authticateSpotify();
+        if (data.votes_to_skip) {
+          setVotesToSkip(data.votes_to_skip);
+          setGuestCanPause(data.guest_can_pause);
+          setIsHost(data.is_host);
+          if (data.is_host) {
+            authticateSpotify();
+          }
         }
       })
   }, [])
+
   function authticateSpotify() {
     fetch('/spotify/is-authenticated')
       .then((response) => response.json())

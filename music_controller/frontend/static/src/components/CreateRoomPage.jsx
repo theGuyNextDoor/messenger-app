@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Grid, FormHelperText, FormControl, FormControlLabel, Typography, TextField, Button, Radio, RadioGroup, Collapse } from '@material-ui/core'
+import { Grid, FormHelperText, FormControl, FormControlLabel, Typography, TextField, Button, Radio, RadioGroup, Collapse } from '@mui/material'
 import Alert from '@material-ui/lab/Alert'
 
 function CreateRoomPage(props) {

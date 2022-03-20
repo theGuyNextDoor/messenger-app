@@ -1,9 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Button, Typography } from '@material-ui/core'
+import { Grid, Button, Typography } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
+import MusicPlayer from './MusicPlayer.jsx';
 
 function Room(props) {
+  const [song, setSong] = useState()
+  const [polling, setPolling] = useState(0);
   const navigate = useNavigate()
+
+  useEffect(() => {
+    fetch('/spotify/current-song')
+      .then((response) => {
+        console.log(response);
+        if (!response.ok) {
+          return {};
+        }
+        return response.json()
+      })
+      .then((data) => {
+        setSong(data)
+        // console.log('current song', data) // DELETE ME
+      });
+      // setInterval(() => setPolling(polling + 1), 1000)
+  }, [polling])
 
   const leaveButtonPress = () => {
     const options = {
@@ -17,7 +36,7 @@ function Room(props) {
         props.setRoomCallback(null);
         navigate(path);
       })
-  }
+  };
 
   return(
     <Grid container spacing={1}>
@@ -28,22 +47,10 @@ function Room(props) {
         </Typography>
       </Grid>
 
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Votes To Skip: {props.votesToSkip}
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Guest Can Pause: {props.guestCanPause.toString()}
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Is Host: {props.isHost.toString()}
-        </Typography>
+      <Grid item xs={12} align="center" >
+        <Grid xs={6} align="center">
+          <MusicPlayer {...song} />
+        </Grid>
       </Grid>
 
       {!props.showSettings && (<Grid item xs={12} align="center">

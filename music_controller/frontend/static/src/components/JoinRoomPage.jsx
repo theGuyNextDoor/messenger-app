@@ -1,6 +1,6 @@
 import React, { useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Grid, Typography, TextField, Button} from '@material-ui/core'
+import { Grid, Typography, TextField, Button} from '@mui/material'
 
 function JoinRoomPage() {
   const [roomCode, setRoomCode] = useState('');

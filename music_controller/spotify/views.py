@@ -1,12 +1,31 @@
 from django.shortcuts import render, redirect
 from requests import Request, post
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import generics, status
 from rest_framework.response import Response
+from .serializers import SpotifyTokenSerializer
 from .credentials import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, BASIC_AUTH
-from .util import update_or_create_user_tokens, is_spotify_authenticated
+from .util import *
+from .models import SpotifyToken
+from api.models import Room
 
-# Create your views here.
+class SpotifyTokenView(generics.ListAPIView): # creates a layout for you also use CreateAPIView
+  queryset = SpotifyToken.objects.all()
+  serializer_class = SpotifyTokenSerializer
+
+# NOT USED IN FRONT END DELETES SESSION USER SPOTIFY TOKEN IF REFRESH TOKEN IS REVOKED
+class RevokeToken(APIView):
+  def post(self, request, format=None):
+    if self.request.session.session_key:
+      user = self.request.session.session_key
+      token_results = SpotifyToken.objects.filter(user=user)
+
+      if len(token_results) > 0:
+        token = token_results[0]
+        token.delete()
+
+      return Response({'Message': 'Success'}, status=status.HTTP_200_OK)
+# NOT USED IN FRONT END DELETES SESSION USER SPOTIFY TOKEN IF REFRESH TOKEN IS REVOKED
 
 # FRONT END CALLS THIS, THEN...
 class AuthURL(APIView):
@@ -52,11 +71,54 @@ def spotify_cb(request, format=None):
 
   return redirect('frontend:') # REDIRECT BACK TO APPLICATION WITH AUTHENTICATION CREDENTIALS, THEN... check urls
 
+class ResetUsers(APIView):
+  pass
+
 class IsAuthenticated(APIView):
   def get(self, request, format=None):
     is_authenticated = is_spotify_authenticated(self.request.session.session_key)
     return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
 
-# class CurrentSong(APIView):
-#   def get(self, requet, format=None):
-#     room_code = self.request.session.get['room-code']
+class CurrentSong(APIView):
+  def get(self, requet, format=None):
+    room_code = self.request.session.get('room_code')
+    room = Room.objects.filter(code=room_code)
+    if room.exists():
+      room = room[0]
+    else:
+      return Response({}, status=status.HTTP_404_NOT_FOUND)
+    host = room.host
+    endpoint = 'player/currently-playing'
+
+    response = execute_spotify_request(host, endpoint)
+
+    if 'error' in response or 'item' not in response:
+      return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+    item = response.get('item')
+    duration = item.get('duration_ms')
+    progress = response.get('progress_ms')
+    album_cover = item.get('album').get('images')[0].get('url')
+    is_playing = response.get('is_playing')
+    song_id = item.get('id')
+    artist_str = ''
+
+    for i, artist in enumerate(item.get('artists')):
+      if i > 0:
+        artist_str += ', '
+
+      name = artist.get('name')
+      artist_str += name
+
+    song = {
+      'id': song_id,
+      'title': item.get('name'),
+      'artist': artist_str,
+      'duration': duration,
+      'time': progress,
+      'image_url': album_cover,
+      'is_playing': is_playing,
+      'votes': 0,
+    }
+
+    return Response(song, status=status.HTTP_200_OK)

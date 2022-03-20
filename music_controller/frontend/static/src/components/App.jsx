@@ -14,7 +14,6 @@ function App() {
     fetch('/api/user-in-room')
         .then((response) => response.json())
         .then(({ code }) => {
-          console.log('effect code', code) // DELETE ME ------------------------
           setRoomCode(code);
         });
   }, []);
