@@ -26,6 +26,7 @@ function Toggle({ setRoomCallback }) {
       })
       .then((data) => {
         if (data.votes_to_skip) {
+          console.log(data) // DELETE ME ---------------------------------------
           setVotesToSkip(data.votes_to_skip);
           setGuestCanPause(data.guest_can_pause);
           setIsHost(data.is_host);
@@ -59,7 +60,7 @@ function Toggle({ setRoomCallback }) {
     return (
       <Settings
         updateShowSettings={updateShowSettings}
-        votesToSkip={votesToSkip}
+        // votesToSkip={votesToSkip}
         setVotesToSkip={setVotesToSkip}
         guestCanPause={guestCanPause}
         setGuestCanPause={setGuestCanPause}

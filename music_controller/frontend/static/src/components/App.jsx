@@ -4,6 +4,7 @@ import HomePage from './HomePage.jsx';
 import JoinRoomPage from './JoinRoomPage.jsx';
 import CreateRoomPage from './CreateRoomPage.jsx';
 import Toggle from './Toggle.jsx';
+import Info from './Info.jsx';
 
 function App() {
   const [guestCanPause, setGuestCanPause ] = useState(true);
@@ -31,6 +32,7 @@ function App() {
           setGuestCanPause={setGuestCanPause}
           />}
         />
+        <Route path='/info' element={<Info />} />
         <Route path='/room/:roomCode' element={<Toggle setRoomCallback={setRoomCode} />} />
       </Routes>
     </Router>

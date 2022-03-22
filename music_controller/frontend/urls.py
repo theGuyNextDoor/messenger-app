@@ -5,6 +5,7 @@ app_name = 'frontend' # MUST DO SO DJANGO KNOWS THIS URLS BELONGS TO FRONTEND *A
 
 urlpatterns = [
   path('', index, name=''),
+  path('info', index),
   path('join/', index),
   path('create/', index),
   path('room/<str:roomCode>', index),

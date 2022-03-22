@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useInterval } from 'react'
 import { Grid, Button, Typography } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import MusicPlayer from './MusicPlayer.jsx';
 
 function Room(props) {
-  const [song, setSong] = useState()
-  const [polling, setPolling] = useState(0);
-  const navigate = useNavigate()
+  const [song, setSong] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const interval = setInterval(getSongInfo, 1000);
+
+    return () => clearInterval(interval);
+  }, [])
+
+  const getSongInfo = () => {
     fetch('/spotify/current-song')
       .then((response) => {
-        console.log(response);
         if (!response.ok) {
           return {};
         }
@@ -19,10 +23,8 @@ function Room(props) {
       })
       .then((data) => {
         setSong(data)
-        // console.log('current song', data) // DELETE ME
       });
-      // setInterval(() => setPolling(polling + 1), 1000)
-  }, [polling])
+  }
 
   const leaveButtonPress = () => {
     const options = {
@@ -48,7 +50,7 @@ function Room(props) {
       </Grid>
 
       <Grid item xs={12} align="center" >
-        <Grid xs={6} align="center">
+        <Grid item xs={6} align="center">
           <MusicPlayer {...song} />
         </Grid>
       </Grid>

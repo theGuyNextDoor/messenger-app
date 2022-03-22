@@ -15,8 +15,16 @@ function HomePage() {
 
       <Grid item xs={12} align="center">
         <ButtonGroup disableElevation variant="contained">
-          <Button color="primary" to="./join" component={Link}>Join A Room</Button>
-          <Button color="secondary" to="./create" component={Link}>Create A Room</Button>
+          <Grid container>
+            <Grid item xs={12} align="center">
+              <Button color="info" to="./info" component={Link}>Info</Button>
+            </Grid>
+
+            <Grid item xs={12} align="center">
+              <Button color="primary" to="./join" component={Link}>Join A Room</Button>
+              <Button color="secondary" to="./create" component={Link}>Create A Room</Button>
+            </Grid>
+          </Grid>
         </ButtonGroup>
       </Grid>
 

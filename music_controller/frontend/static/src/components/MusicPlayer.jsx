@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid, Typography, Card, IconButton, LinearProgress } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -6,7 +6,23 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 function MusicPlayer(props) {
   const songProgress = (props.time / props.duration) * 100;
-  console.log('props', props)
+
+  const controlSong = () => {
+    let action = props.is_playing ? 'pause' : 'play';
+    const options ={
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'}
+    }
+
+    fetch(`/spotify/${action}`, options)
+  };
+  const skipSong = () => {
+    const options = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+    };
+    fetch('/spotify/skip', options)
+  }
 
   return(
     <Card>
@@ -25,12 +41,17 @@ function MusicPlayer(props) {
           </Typography>
           <div>
 
-            <IconButton>
-              {props.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
+            <IconButton onClick={controlSong} >
+              {
+                props.is_playing ?
+                <PauseIcon />
+                :
+                <PlayArrowIcon />
+              }
             </IconButton>
 
-            <IconButton>
-              <SkipNextIcon />
+            <IconButton onClick={skipSong}>
+              <SkipNextIcon /> {props.votes} / {props.votes_required}
             </IconButton>
 
           </div>
